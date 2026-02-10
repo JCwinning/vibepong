@@ -865,8 +865,8 @@ select:focus {
 }
 
 .control-btn {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   border: 2px solid;
   background: rgba(0, 0, 0, 0.4);
@@ -885,8 +885,8 @@ select:focus {
 }
 
 .control-btn svg {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: block;
 }
 
@@ -894,4 +894,43 @@ select:focus {
   background: rgba(255, 255, 255, 0.1);
   transform: scale(0.92);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .mobile-controls {
+    margin-top: 5px;
+    padding-bottom: 10px;
+    gap: 4px;
+    position: fixed;
+    bottom: 10px;
+    left: 0;
+    z-index: 100;
+  }
+
+  .control-group {
+    padding: 6px 10px;
+    min-width: auto;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .control-label {
+    display: none;
+    /* Hide labels on mobile to save space */
+  }
+
+  .control-buttons {
+    gap: 12px;
+  }
+
+  .control-btn {
+    width: 48px;
+    height: 48px;
+    border-width: 1.5px;
+  }
+
+  .control-btn svg {
+    width: 24px;
+    height: 24px;
+  }
 }
