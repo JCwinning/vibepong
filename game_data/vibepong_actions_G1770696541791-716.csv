@@ -1,9 +1,0 @@
-Game ID,Timestamp (ms),Player,Action
-"G1770696541791-716","4001","System","Ball served towards CPU"
-"G1770696541791-716","5204","CPU","Hit Ball"
-"G1770696541791-716","7721","Tony","Lost Life. Remaining: 1"
-"G1770696541791-716","7721","System","Ball served towards Tony"
-"G1770696541791-716","8937","Tony","Hit Ball"
-"G1770696541791-716","11354","CPU","Hit Ball"
-"G1770696541791-716","13872","Tony","Lost Life. Remaining: 0"
-"G1770696541791-716","13872","Tony","Eliminated"

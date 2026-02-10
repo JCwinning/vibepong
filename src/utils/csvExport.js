@@ -3,7 +3,7 @@ export const exportToCSV = (gameData) => {
 
     // 1. Summary CSV
     // 1. Summary CSV
-    const summaryHeaders = ['Game ID', 'Date', 'Duration (s)', 'Winner', 'Ball Speed', 'Player', 'Lives', 'Hits'];
+    const summaryHeaders = ['Game ID', 'Date', 'Duration (s)', 'Winner', 'Ball Speed', 'Theme', 'Language', 'Player', 'Lives', 'Hits'];
     const summaryRows = [];
 
     gameData.players.forEach(player => {
@@ -13,6 +13,8 @@ export const exportToCSV = (gameData) => {
             gameData.duration,
             gameData.winner,
             gameData.ballSpeed,
+            gameData.theme,
+            gameData.language,
             player.name,
             player.lives,
             player.hits || 0

@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 

@@ -361,6 +361,8 @@ export class GameEngine {
                 duration,
                 winner: this.winner,
                 ballSpeed: this.ball.speed.toFixed(2),
+                theme: this.settings?.theme || 'unknown',
+                language: this.settings?.language || 'unknown',
                 players: Object.values(this.players).map(p => ({
                     name: p.name,
                     lives: p.lives,

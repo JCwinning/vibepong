@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { GameEngine, CANVAS_WIDTH, CANVAS_HEIGHT, SQUARE_SIZE } from '../utils/gameLogic';
 import { exportToCSV } from '../utils/csvExport';
+import { getText } from '../utils/i18n';
 
 const PLAYER_COLORS_HEX = {
     p1: '#00f3ff',
@@ -16,14 +17,8 @@ const KEYS_MAP = {
     p4: 'N / M',
 };
 
-const SIDE_LABELS = {
-    left: 'Left',
-    right: 'Right',
-    top: 'Top',
-    bottom: 'Bottom',
-};
-
-const GameCanvas = ({ settings, onEnd }) => {
+const GameCanvas = ({ settings, onEnd, language, theme }) => {
+    const t = useCallback((key, vars) => getText(language, key, vars), [language]);
     const canvasRef = useRef(null);
     const gameRef = useRef(null);
     const frameIdRef = useRef(null);
@@ -40,7 +35,7 @@ const GameCanvas = ({ settings, onEnd }) => {
     const lastProcessedGameId = useRef(null);
 
     // Helper to start/restart game
-    const startGame = () => {
+    const startGame = useCallback(() => {
         setGameOverStats(null);
         setPlayerStates({});
         lifeLostOverlaysRef.current = [];
@@ -74,8 +69,12 @@ const GameCanvas = ({ settings, onEnd }) => {
             const ctx = canvas.getContext('2d');
             const now = performance.now();
 
+            const isLight = theme === 'light';
+            const backgroundColor = isLight ? '#ffffff' : '#050505';
+            const ballColor = isLight ? '#ff7a00' : '#ffffff';
+
             // Draw Background
-            ctx.fillStyle = '#050505';
+            ctx.fillStyle = backgroundColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             // ── Life Lost Effects: consume from engine queue ──
@@ -134,9 +133,10 @@ const GameCanvas = ({ settings, onEnd }) => {
                     ctx.fillStyle = color;
                     ctx.shadowColor = color;
                     ctx.shadowBlur = 10;
+                    const lifeUnit = eff.remainingLives === 1 ? t('life') : t('lives');
                     const lifeText = eff.remainingLives <= 0
-                        ? `${eff.playerName} ELIMINATED!`
-                        : `${eff.playerName} — ${eff.remainingLives} ${eff.remainingLives === 1 ? 'life' : 'lives'} left`;
+                        ? t('eliminated', { name: eff.playerName })
+                        : t('livesRemaining', { name: eff.playerName, count: eff.remainingLives, unit: lifeUnit });
                     ctx.fillText(lifeText, canvas.width / 2, canvas.height / 2 + 25 - yOffset);
                     ctx.restore();
                 }
@@ -161,24 +161,25 @@ const GameCanvas = ({ settings, onEnd }) => {
                 const b = game.ball;
                 ctx.beginPath();
                 ctx.arc(b.x, b.y, 8, 0, Math.PI * 2);
-                ctx.fillStyle = '#fff';
+                ctx.fillStyle = ballColor;
                 ctx.shadowBlur = 10;
-                ctx.shadowColor = '#fff';
+                ctx.shadowColor = ballColor;
                 ctx.fill();
                 ctx.closePath();
             }
 
             // Draw Countdown
             if (game.countdown !== null && game.countdown >= 0) {
-                ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                const isLight = theme === 'light';
+                ctx.fillStyle = isLight ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.7)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#fff';
+                ctx.fillStyle = isLight ? '#222' : '#fff';
                 ctx.font = '100px Orbitron, Inter, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = '#00f3ff';
-                ctx.fillText(Math.ceil(game.countdown) === 0 ? "GO!" : Math.ceil(game.countdown), canvas.width / 2, canvas.height / 2);
+                ctx.fillText(Math.ceil(game.countdown) === 0 ? t('go') : Math.ceil(game.countdown), canvas.width / 2, canvas.height / 2);
 
                 // Show keys for each human player during countdown
                 Object.values(game.players).forEach(p => {
@@ -201,7 +202,7 @@ const GameCanvas = ({ settings, onEnd }) => {
 
                         ctx.fillText(KEYS_MAP[p.id], tx, ty);
                         ctx.font = '12px Inter, sans-serif';
-                        ctx.fillText('KEYS', tx, ty + 25);
+                        ctx.fillText(t('keys'), tx, ty + 25);
                         ctx.restore();
                     }
                 });
@@ -209,26 +210,27 @@ const GameCanvas = ({ settings, onEnd }) => {
 
             // Draw Game Over
             if (game.winner) {
-                ctx.fillStyle = 'rgba(0,0,0,0.85)';
+                const isLight = theme === 'light';
+                ctx.fillStyle = isLight ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.85)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 ctx.shadowBlur = 30;
                 ctx.shadowColor = '#ff00ff';
-                ctx.fillStyle = '#fff';
+                ctx.fillStyle = isLight ? '#222' : '#fff';
                 ctx.font = 'bold 72px Orbitron, Inter, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 60);
+                ctx.fillText(t('gameOver'), canvas.width / 2, canvas.height / 2 - 60);
 
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = '#00f3ff';
                 ctx.font = 'bold 36px Inter, sans-serif';
-                ctx.fillText(`🏆 Winner: ${game.winner}`, canvas.width / 2, canvas.height / 2 + 10);
+                ctx.fillText(t('winner', { name: game.winner }), canvas.width / 2, canvas.height / 2 + 10);
 
                 ctx.shadowBlur = 0;
-                ctx.fillStyle = '#888';
+                ctx.fillStyle = isLight ? '#666' : '#888';
                 ctx.font = '16px Inter, sans-serif';
-                ctx.fillText('Game data saved automatically', canvas.width / 2, canvas.height / 2 + 60);
+                ctx.fillText(t('gameSaved'), canvas.width / 2, canvas.height / 2 + 60);
 
                 return;
             }
@@ -254,12 +256,12 @@ const GameCanvas = ({ settings, onEnd }) => {
         setPlayerStates(initStates);
 
         render();
-    };
+    }, [settings, t, theme]);
 
     useEffect(() => {
         startGame();
         return () => cancelAnimationFrame(frameIdRef.current);
-    }, [settings]);
+    }, [startGame]);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -303,7 +305,7 @@ const GameCanvas = ({ settings, onEnd }) => {
                 <canvas
                     ref={canvasRef}
                     style={{
-                        border: '1px solid rgba(255,255,255,0.1)',
+                        border: `1px solid ${theme === 'light' ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'}`,
                         borderBottom: 'none',
                         borderRadius: '16px 16px 0 0',
                         maxWidth: '95vw',
@@ -331,7 +333,7 @@ const GameCanvas = ({ settings, onEnd }) => {
                                 cursor: 'pointer',
                                 color: '#00f3ff',
                                 border: '2px solid #00f3ff',
-                                backgroundColor: 'rgba(0,0,0,0.9)',
+                                backgroundColor: theme === 'light' ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,0.9)',
                                 boxShadow: '0 0 15px #00f3ff',
                                 borderRadius: '8px',
                                 fontWeight: 'bold',
@@ -339,7 +341,7 @@ const GameCanvas = ({ settings, onEnd }) => {
                                 textTransform: 'uppercase',
                                 transition: 'all 0.2s',
                                 fontFamily: 'Orbitron, Inter, sans-serif'
-                            }}>🔄 Restart</button>
+                            }}>{t('restart')}</button>
 
                             <button onClick={onEnd} style={{
                                 fontSize: '1.2em',
@@ -347,7 +349,7 @@ const GameCanvas = ({ settings, onEnd }) => {
                                 cursor: 'pointer',
                                 color: '#ff00ff',
                                 border: '2px solid #ff00ff',
-                                backgroundColor: 'rgba(0,0,0,0.9)',
+                                backgroundColor: theme === 'light' ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,0.9)',
                                 boxShadow: '0 0 15px #ff00ff',
                                 borderRadius: '8px',
                                 fontWeight: 'bold',
@@ -355,7 +357,7 @@ const GameCanvas = ({ settings, onEnd }) => {
                                 textTransform: 'uppercase',
                                 transition: 'all 0.2s',
                                 fontFamily: 'Orbitron, Inter, sans-serif'
-                            }}>📋 Menu</button>
+                            }}>{t('menu')}</button>
                         </div>
                     </div>
                 )}
@@ -367,7 +369,7 @@ const GameCanvas = ({ settings, onEnd }) => {
                     const p = playerStates[pid];
                     if (!p) return null;
                     const color = PLAYER_COLORS_HEX[pid];
-                    const sideLabel = SIDE_LABELS[p.side] || '';
+                    const sideLabel = t(`side_${p.side}`);
                     return (
                         <div
                             key={pid}
@@ -386,7 +388,7 @@ const GameCanvas = ({ settings, onEnd }) => {
                                     </span>
                                     {p.isAI ? (
                                         <span className="player-info-cpu-badge">
-                                            CPU · {p.difficulty === 'superEasy' ? 'S.Easy' : p.difficulty}
+                                            {t('cpu')} · {t(`difficultyShort_${p.difficulty}`) || p.difficulty}
                                         </span>
                                     ) : (
                                         <span className="player-info-keys-box">
