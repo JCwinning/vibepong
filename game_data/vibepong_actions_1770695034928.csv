@@ -1,0 +1,10 @@
+Timestamp (ms),Player,Action
+"4000","System","Ball served towards Player 3"
+"5049","Player 3","Hit Ball"
+"7700","Player 2","Lost Life. Remaining: 0"
+"7700","Player 2","Eliminated"
+"7700","System","Ball served towards Player 1"
+"8832","Player 1","Hit Ball"
+"13532","Player 1","Hit Ball"
+"18349","Player 1","Lost Life. Remaining: 0"
+"18349","Player 1","Eliminated"

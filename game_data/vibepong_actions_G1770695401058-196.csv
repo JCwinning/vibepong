@@ -1,0 +1,6 @@
+Game ID,Timestamp (ms),Player,Action
+"G1770695401058-196","7995","System","Ball served towards Player 1"
+"G1770695401058-196","269947","Player 1","Hit Ball"
+"G1770695401058-196","272379","CPU","Hit Ball"
+"G1770695401058-196","274912","Player 1","Lost Life. Remaining: 0"
+"G1770695401058-196","274912","Player 1","Eliminated"

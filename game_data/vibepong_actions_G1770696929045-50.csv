@@ -1,0 +1,11 @@
+Game ID,Timestamp (ms),Player,Action
+"G1770696929045-50","4001","System","Ball served towards Player 1"
+"G1770696929045-50","4919","Player 1","Hit Ball"
+"G1770696929045-50","6785","CPU","Hit Ball"
+"G1770696929045-50","8652","Player 1","Hit Ball"
+"G1770696929045-50","10518","CPU","Hit Ball"
+"G1770696929045-50","12385","Player 1","Hit Ball"
+"G1770696929045-50","14252","CPU","Hit Ball"
+"G1770696929045-50","16118","Player 1","Hit Ball"
+"G1770696929045-50","18070","CPU","Lost Life. Remaining: 0"
+"G1770696929045-50","18070","CPU","Eliminated"
