@@ -309,7 +309,7 @@ const GameCanvas = ({ settings, onEnd, language, theme }) => {
                         borderBottom: 'none',
                         borderRadius: '16px 16px 0 0',
                         maxWidth: '95vw',
-                        maxHeight: '80vh',
+                        maxHeight: '60vh',
                         display: 'block'
                     }}
                 />
@@ -398,6 +398,82 @@ const GameCanvas = ({ settings, onEnd, language, theme }) => {
                                         </span>
                                     )}
                                 </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* Mobile Controls */}
+            <div className="mobile-controls">
+                {activePlayerIds.map(pid => {
+                    const p = playerStates[pid];
+                    if (!p || p.isAI) return null;
+
+                    const isVertical = p.side === 'left' || p.side === 'right';
+                    const color = PLAYER_COLORS_HEX[pid];
+
+                    return (
+                        <div key={pid} className="control-group" style={{ borderColor: `${color}40`, background: `linear-gradient(180deg, ${color}10, transparent)` }}>
+                            <div className="control-label" style={{ color: color, textShadow: `0 0 5px ${color}` }}>
+                                {p.name}
+                            </div>
+                            <div className="control-buttons">
+                                {isVertical ? (
+                                    <>
+                                        <button
+                                            className="control-btn"
+                                            style={{ borderColor: color, color: color }}
+                                            onTouchStart={(e) => { e.preventDefault(); inputRef.current[pid].up = true; }}
+                                            onTouchEnd={(e) => { e.preventDefault(); inputRef.current[pid].up = false; }}
+                                            onTouchCancel={(e) => { e.preventDefault(); inputRef.current[pid].up = false; }}
+                                            onMouseDown={() => inputRef.current[pid].up = true}
+                                            onMouseUp={() => inputRef.current[pid].up = false}
+                                            onMouseLeave={() => inputRef.current[pid].up = false}
+                                        >
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-8 8h16l-8-8z" /></svg>
+                                        </button>
+                                        <button
+                                            className="control-btn"
+                                            style={{ borderColor: color, color: color }}
+                                            onTouchStart={(e) => { e.preventDefault(); inputRef.current[pid].down = true; }}
+                                            onTouchEnd={(e) => { e.preventDefault(); inputRef.current[pid].down = false; }}
+                                            onTouchCancel={(e) => { e.preventDefault(); inputRef.current[pid].down = false; }}
+                                            onMouseDown={() => inputRef.current[pid].down = true}
+                                            onMouseUp={() => inputRef.current[pid].down = false}
+                                            onMouseLeave={() => inputRef.current[pid].down = false}
+                                        >
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20l-8-8h16l-8 8z" /></svg>
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <button
+                                            className="control-btn"
+                                            style={{ borderColor: color, color: color }}
+                                            onTouchStart={(e) => { e.preventDefault(); inputRef.current[pid].left = true; }}
+                                            onTouchEnd={(e) => { e.preventDefault(); inputRef.current[pid].left = false; }}
+                                            onTouchCancel={(e) => { e.preventDefault(); inputRef.current[pid].left = false; }}
+                                            onMouseDown={() => inputRef.current[pid].left = true}
+                                            onMouseUp={() => inputRef.current[pid].left = false}
+                                            onMouseLeave={() => inputRef.current[pid].left = false}
+                                        >
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 12l8-8v16l-8-8z" /></svg>
+                                        </button>
+                                        <button
+                                            className="control-btn"
+                                            style={{ borderColor: color, color: color }}
+                                            onTouchStart={(e) => { e.preventDefault(); inputRef.current[pid].right = true; }}
+                                            onTouchEnd={(e) => { e.preventDefault(); inputRef.current[pid].right = false; }}
+                                            onTouchCancel={(e) => { e.preventDefault(); inputRef.current[pid].right = false; }}
+                                            onMouseDown={() => inputRef.current[pid].right = true}
+                                            onMouseUp={() => inputRef.current[pid].right = false}
+                                            onMouseLeave={() => inputRef.current[pid].right = false}
+                                        >
+                                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 12l-8-8v16l8-8z" /></svg>
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     );
