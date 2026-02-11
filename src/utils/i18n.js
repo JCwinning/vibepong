@@ -34,7 +34,10 @@ const translations = {
     side_left: 'Left',
     side_right: 'Right',
     side_top: 'Top',
-    side_bottom: 'Bottom'
+    side_bottom: 'Bottom',
+    rank_2: '🥈 2nd: {name}',
+    rank_3: '🥉 3rd: {name}',
+    rank_4: '4th: {name}'
   },
   zh: {
     menuSubtitle: '多人霓虹乒乓',
@@ -71,7 +74,10 @@ const translations = {
     side_left: '左',
     side_right: '右',
     side_top: '上',
-    side_bottom: '下'
+    side_bottom: '下',
+    rank_2: '🥈 第二名：{name}',
+    rank_3: '🥉 第三名：{name}',
+    rank_4: '第四名：{name}'
   }
 };
 

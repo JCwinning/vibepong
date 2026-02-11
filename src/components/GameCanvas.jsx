@@ -220,17 +220,31 @@ const GameCanvas = ({ settings, onEnd, language, theme }) => {
                 ctx.font = 'bold 72px Orbitron, Inter, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(t('gameOver'), canvas.width / 2, canvas.height / 2 - 60);
+                ctx.fillText(t('gameOver'), canvas.width / 2, canvas.height / 2 - 80);
 
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = '#00f3ff';
                 ctx.font = 'bold 36px Inter, sans-serif';
-                ctx.fillText(t('winner', { name: game.winner }), canvas.width / 2, canvas.height / 2 + 10);
+                ctx.fillText(t('winner', { name: game.winner }), canvas.width / 2, canvas.height / 2 - 20);
+
+                // Display Rankings (2nd, 3rd, 4th)
+                if (game.ranking && game.ranking.length > 1) {
+                    ctx.font = 'bold 20px Inter, sans-serif';
+                    ctx.fillStyle = isLight ? '#555' : '#ccc';
+                    ctx.shadowBlur = 0;
+
+                    let yOffset = 25;
+                    game.ranking.slice(1).forEach((r) => {
+                        const rankText = t(`rank_${r.place}`, { name: r.name }) || `${r.place}. ${r.name}`;
+                        ctx.fillText(rankText, canvas.width / 2, canvas.height / 2 + yOffset);
+                        yOffset += 30;
+                    });
+                }
 
                 ctx.shadowBlur = 0;
                 ctx.fillStyle = isLight ? '#666' : '#888';
                 ctx.font = '16px Inter, sans-serif';
-                ctx.fillText(t('gameSaved'), canvas.width / 2, canvas.height / 2 + 60);
+                ctx.fillText(t('gameSaved'), canvas.width / 2, canvas.height / 2 + 130);
 
                 return;
             }
@@ -418,7 +432,7 @@ const GameCanvas = ({ settings, onEnd, language, theme }) => {
                             <div className="control-label" style={{ color: color, textShadow: `0 0 5px ${color}` }}>
                                 {p.name}
                             </div>
-                            <div className="control-buttons">
+                            <div className="control-buttons" style={{ flexDirection: isVertical ? 'column' : 'row' }}>
                                 {isVertical ? (
                                     <>
                                         <button

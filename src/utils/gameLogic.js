@@ -85,6 +85,8 @@ export class GameEngine {
         this.startTime = Date.now();
         this.gameId = `G${this.startTime}-${Math.floor(Math.random() * 1000)}`;
         this.winner = null;
+        this.ranking = null;
+        this.eliminations = [];
         this.actionLog = [];
         this.countdown = 3;
         this.isPaused = true;
@@ -339,6 +341,9 @@ export class GameEngine {
 
         if (p.lives <= 0) {
             p.active = false;
+            if (!this.eliminations.find(e => e.id === playerId)) {
+                this.eliminations.push({ id: playerId, name: p.name });
+            }
             this.logAction(playerId, 'Eliminated');
         }
 
@@ -353,6 +358,18 @@ export class GameEngine {
 
         if (activePlayers.length <= 1) {
             this.winner = activePlayers.length === 1 ? activePlayers[0].name : "No One";
+
+            // Calculate Ranking
+            this.ranking = [];
+            if (activePlayers.length === 1) {
+                this.ranking.push({ place: 1, name: activePlayers[0].name });
+            }
+            // Add eliminated players in reverse order
+            const reversedEliminations = [...this.eliminations].reverse();
+            reversedEliminations.forEach((p, index) => {
+                this.ranking.push({ place: this.ranking.length + 1, name: p.name });
+            });
+
             const duration = ((Date.now() - this.startTime) / 1000).toFixed(2);
 
             const stats = {
@@ -360,6 +377,7 @@ export class GameEngine {
                 gameId: this.gameId,
                 duration,
                 winner: this.winner,
+                ranking: this.ranking,
                 ballSpeed: this.ball.speed.toFixed(2),
                 theme: this.settings?.theme || 'unknown',
                 language: this.settings?.language || 'unknown',
