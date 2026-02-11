@@ -834,9 +834,16 @@ select:focus {
   width: 100%;
   gap: 10px;
   margin-top: 10px;
-  justify-content: center;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  flex-wrap: nowrap;
   padding-bottom: 20px;
+  padding-left: 20px;
+  padding-right: 20px;
+  box-sizing: border-box;
+}
+
+.mobile-controls-spacer {
+  flex: 1;
 }
 
 .control-group {
@@ -899,12 +906,13 @@ select:focus {
 @media (max-width: 768px) {
   .mobile-controls {
     margin-top: 5px;
-    padding-bottom: 10px;
+    padding: 0 10px 10px 10px;
     gap: 4px;
     position: fixed;
     bottom: 10px;
     left: 0;
     z-index: 100;
+    justify-content: space-between;
   }
 
   .control-group {

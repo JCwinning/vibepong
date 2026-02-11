@@ -35,16 +35,31 @@ data_dir = './game_data'
 # Get lists of files
 summary_files = glob.glob(os.path.join(data_dir, 'vibepong_summary_*.csv'))
 action_files = glob.glob(os.path.join(data_dir, 'vibepong_actions_*.csv'))
+telemetry_files = glob.glob(os.path.join(data_dir, 'vibepong_telemetry_*.csv'))
 
-print(f"Found {len(summary_files)} summary files and {len(action_files)} action files.")
+print(f"Found {len(summary_files)} summary files and {len(action_files)} action files and {len(telemetry_files)} action files..")
+```
 
+
+
+```{python}
 # Load and combine summary data
 df_summary = pd.concat([pd.read_csv(f) for f in summary_files], ignore_index=True)
 
 # Load and combine action data
 df_actions = pd.concat([pd.read_csv(f) for f in action_files], ignore_index=True)
+
+# Load and combine action data
+df_telemetry = pd.concat([pd.read_csv(f) for f in telemetry_files], ignore_index=True)
 ```
 
+
+
+## game by game  data
+```{python}
+# Display the first few rows of summary data
+df_summary.head()
+```
 
 ## Play by Play data
 ```{python}
@@ -53,11 +68,12 @@ df_actions.head()
 ```
 
 
-## Game by Game data
+## time by time data
 ```{python}
 # Display the first few rows of summary data
-df_summary.head()
+df_telemetry.head()
 ```
+
 
 # Step 2: Data Cleaning
 
@@ -94,14 +110,21 @@ Now we'll look at some key performance indicators and visualize the game results
 
 ## Win Distribution
 
-Who is winning the most games?
-
 ```{python}
 import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Set aesthetic style
 sns.set_theme(style="whitegrid")
+plt.rcParams['font.sans-serif'] = ['Arial Unicode MS']
+plt.rcParams['axes.unicode_minus'] = False
+
+```
+
+Who is winning the most games?
+
+```{python}
+
 
 # Count unique games per winner
 unique_games = df_summary.drop_duplicates(subset=['Game ID'])
@@ -131,7 +154,7 @@ plt.show()
 Tracking the skill (hits) across different game sessions.
 
 ```{python}
-plt.figure(figsize=(12, 6))
+plt.figure(figsize=(10, 6))
 sns.boxplot(data=df_summary, x='Player', y='Hits', palette="magma")
 plt.title('Distribution of Hits per Player', fontsize=15)
 plt.show()
@@ -144,9 +167,94 @@ Analyzing the frequency of actions across all games.
 ```{python}
 action_counts = df_actions['Action'].value_counts().head(10)
 
-plt.figure(figsize=(12, 8))
+plt.figure(figsize=(8, 7))
 action_counts.plot(kind='barh', color='skyblue')
 plt.title('Most Frequent Actions/Events', fontsize=15)
 plt.gca().invert_yaxis()
 plt.show()
+```
+
+# Step 4: Telemetry Data Analysis
+
+Now let's analyze the high-frequency telemetry data that captures ball and paddle positions every 100ms.
+
+
+## Ball Speed Over Time
+
+How does ball speed evolve across all games?
+
+```{python}
+if telemetry_files and len(df_telemetry) > 0:
+    # Get unique game IDs (limit to first 10 for readability)
+    unique_games = df_telemetry['Game ID'].unique()[:10]
+
+    plt.figure(figsize=(8, 6))
+
+    for game_id in unique_games:
+        df_game = df_telemetry[df_telemetry['Game ID'] == game_id]
+        plt.plot(df_game['Timestamp (ms)'] / 1000, df_game['Ball Speed'],
+                 linewidth=1.5, alpha=0.7, label=f'Game {game_id[-6:]}')
+
+    plt.xlabel('Time (seconds)')
+    plt.ylabel('Ball Speed (pixels/frame)')
+    plt.title('Ball Speed Over Time - Multiple Games')
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=5, fontsize=8)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+else:
+    print("No telemetry data available.")
+```
+
+## Ball Trajectory Heatmap
+
+Where does the ball spend most of its time on the court?
+
+```{python}
+if telemetry_files and len(df_telemetry) > 0:
+    plt.figure(figsize=(10, 7))
+    plt.hist2d(df_telemetry['Ball X'], df_telemetry['Ball Y'], bins=50, cmap='hot')
+    plt.colorbar(label='Time Spent (samples)')
+    plt.xlabel('Ball X Position')
+    plt.ylabel('Ball Y Position')
+    plt.title('Ball Position Heatmap (All Games)')
+    plt.show()
+else:
+    print("No telemetry data available.")
+```
+
+## Paddle Movement Analysis
+
+Which players move their paddles the most?
+
+```{python}
+if telemetry_files and len(df_telemetry) > 0:
+    # Find all player distance columns
+    distance_cols = [col for col in df_telemetry.columns if 'Distance' in col and col != 'Ball Distance']
+    player_ids = [col.split()[0] for col in distance_cols]
+
+    if distance_cols:
+        # Sum distance moved per game per player
+        movement_data = []
+        for game_id in df_telemetry['Game ID'].unique():
+            df_game = df_telemetry[df_telemetry['Game ID'] == game_id]
+            for i, col in enumerate(distance_cols):
+                total_movement = df_game[col].sum()
+                movement_data.append({
+                    'Game ID': game_id,
+                    'Player': player_ids[i],
+                    'Total Movement': total_movement
+                })
+
+        df_movement = pd.DataFrame(movement_data)
+
+        plt.figure(figsize=(8, 6))
+        sns.boxplot(data=df_movement, x='Player', y='Total Movement', palette='coolwarm')
+        plt.title('Paddle Movement Distance per Player', fontsize=15)
+        plt.ylabel('Total Movement (pixels)')
+        plt.show()
+    else:
+        print("No distance columns found in telemetry data.")
+else:
+    print("No telemetry data available.")
 ```
